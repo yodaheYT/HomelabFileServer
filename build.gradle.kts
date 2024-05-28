@@ -17,6 +17,7 @@ dependencies {
     implementation("com.sun.net.httpserver:http:20070405")
     implementation("org.xerial:sqlite-jdbc:3.45.1.0")
     implementation("com.google.guava:guava:33.1.0-jre")
+    implementation("org.mongodb:mongodb-driver-sync:5.1.0")
 }
 
 tasks.test {

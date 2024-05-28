@@ -3,12 +3,11 @@ package Server.Auth;
 import Server.Classes.User;
 
 public class Tokens {
-    public static String genToken(int PermGroup, String Password, String Username) {
-        String p1 = Hash.Hash(String.valueOf(PermGroup));
-        String p2 = Password;
-        String p3 = Hash.Hash(Username);
+    public static String genToken(String Password, String Username) {
+        String p1 = Password;
+        String p2 = Hash.Hash(Username);
 
-        return (p1 + p2 + p3);
+        return (p1 + p2);
     }
 
 

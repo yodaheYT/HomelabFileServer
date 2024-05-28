@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import static Server.Main.logHandler;
 
+@Deprecated
 public class SQLite {
     Connection c = null;
     public void connect() {

@@ -5,7 +5,7 @@ import Server.Auth.Tokens;
 
 public class User {
     public String USERNAME;
-    private String PASSWORD;
+    public String PASSWORD;
     public String EMAIL;
     public int USERGROUP;
 
@@ -17,7 +17,7 @@ public class User {
         EMAIL = email;
         USERGROUP = userGroup;
 
-        TOKEN = Tokens.genToken(userGroup, password, username);
+        TOKEN = Tokens.genToken(password, username);
     }
 
     public boolean Auth(String enter) {

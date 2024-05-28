@@ -15,8 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
 
-import static Server.Main.logHandler;
-import static Server.Main.sqLite;
+import static Server.Main.*;
 
 public class LogIn implements HttpHandler {
     @Override
@@ -44,11 +43,7 @@ public class LogIn implements HttpHandler {
                 if (jsonNode != null) {
                     String email = jsonNode.get("EMAIL").asText();
                     String EnteredPwd = jsonNode.get("PASSWORD").asText();
-
-                    ResultSet rs = sqLite.getUser("EMAIL", email.toLowerCase());
-
-                    User user = new User(rs.getString("USERNAME"), rs.getString("PASSWORD"),
-                            rs.getString("EMAIL"), rs.getInt("USERGROUP"));
+                    User user = mongoDB.getUser("Email", email.toLowerCase());
 
                     if (user.Auth(Hash.Hash(EnteredPwd)) == true) {
                         response = user.giveToken();
@@ -57,9 +52,6 @@ public class LogIn implements HttpHandler {
                 }
             }
         } catch (IOException e) {
-            logHandler.error(e.toString());
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
             logHandler.error(e.toString());
             throw new RuntimeException(e);
         }

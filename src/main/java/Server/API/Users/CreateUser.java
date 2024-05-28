@@ -16,8 +16,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 
-import static Server.Main.logHandler;
-import static Server.Main.sqLite;
+import static Server.Main.*;
 
 public class CreateUser implements HttpHandler {
     @Override
@@ -27,8 +26,8 @@ public class CreateUser implements HttpHandler {
         InputStream is = exchange.getRequestBody();
         String result = null;
 
-        int rCode = 404;
-        String response = "404";
+        int rCode = 200;
+        String response = "200";
         JsonNode jsonNode = null;
         try {
             if (is.available() > 0) {
@@ -45,11 +44,11 @@ public class CreateUser implements HttpHandler {
 
                 if (jsonNode != null) {
 
-                    if (sqLite.isEmailUsedAlready(jsonNode.get("EMAIL").asText().toLowerCase())) {
+                    if (mongoDB.getUser("Email", jsonNode.get("EMAIL").asText().toLowerCase()) != null) {
                         logHandler.warning("EMAIL TAKEN");
                         rCode = 400;
                     } else {
-                        if (sqLite.isUsernameUsedAlready(jsonNode.get("USERNAME").asText())) {
+                        if (mongoDB.getUser("USERNAME", jsonNode.get("Username").asText().toLowerCase()) != null) {
                             logHandler.warning("USERNAME TAKEN");
                             rCode = 400;
                         } else {
@@ -58,15 +57,13 @@ public class CreateUser implements HttpHandler {
                             String email = jsonNode.get("EMAIL").asText().toLowerCase();
                             int UserGroup = jsonNode.get("USERGROUP").asInt();
 
-                            String creatorAuth = jsonNode.get("CREATORHASH").asText();
+                            String creatorAuth = jsonNode.get("CREATORAUTH").asText();
 
-                            ResultSet rs = sqLite.getUser("PASSWORD", creatorAuth);
-
-                            User user = new User(rs.getString("USERNAME"), rs.getString("PASSWORD"),
-                                    rs.getString("EMAIL"), rs.getInt("USERGROUP"));
+                            User user = mongoDB.getUser("Token", creatorAuth);
 
                             if (user.Auth(creatorAuth) && user.USERGROUP == UserPermLevels.ROOT) {
-                                sqLite.createUser(password, email, username, UserGroup);
+                                User user2 = new User(username, password, email, UserGroup);
+                                mongoDB.createUser(user2);
 
                                 response = "success";
                                 rCode = 200;
@@ -82,9 +79,6 @@ public class CreateUser implements HttpHandler {
                 }
             }
         } catch (IOException e) {
-            logHandler.error(e.toString());
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
             logHandler.error(e.toString());
             throw new RuntimeException(e);
         }
